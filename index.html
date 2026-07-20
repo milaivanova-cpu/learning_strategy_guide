@@ -57,6 +57,28 @@
   h1 .and{color:var(--s-self)}
   .sub{color:var(--muted);max-width:640px;margin:0 auto;font-size:1.02rem}
   .sub b{color:var(--ink);font-weight:600}
+  .note{max-width:600px;margin:14px auto 0}
+  .note p{color:var(--muted);font-size:.86rem;margin:6px 0;line-height:1.55}
+  .note p:first-child{color:#d9cff5}
+
+  .howto{max-width:520px;margin:22px auto 0;text-align:left;
+    background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:2px 18px}
+  .howto summary{cursor:pointer;font-weight:600;color:var(--ink);padding:12px 0;list-style:none;
+    display:flex;align-items:center;gap:8px;font-size:.94rem}
+  .howto summary::-webkit-details-marker{display:none}
+  .howto summary::before{content:"›";font-size:1.3rem;transition:transform .18s ease;color:var(--s-self);line-height:1}
+  .howto[open] summary::before{transform:rotate(90deg)}
+  .howto ol{margin:0 0 16px;padding-left:22px;color:var(--muted);font-size:.9rem}
+  .howto li{margin:5px 0}
+
+  .mode-row{align-items:center;margin-bottom:4px}
+  .mode-label{color:var(--muted);font-size:.82rem;font-weight:500;margin-right:2px}
+
+  /* version visibility */
+  .student-note{display:none}
+  body.hide-codes .scaletag{display:none}
+  body.hide-codes .codes-note{display:none}
+  body.hide-codes .student-note{display:block}
 
   /* ---------- draw hero ---------- */
   .draw{
@@ -164,17 +186,34 @@
     *{animation:none!important;transition:none!important}
   }
 
-  /* ---------- print ---------- */
+  /* ---------- print: A4 cut-out card sheet, 4 equal cards / page ---------- */
   @media print{
-    body{background:#fff;color:#000}
-    .draw,.controls,.count,.overlay,.flip-hint,footer .noprint{display:none!important}
-    .wrap{max-width:none;padding:0}
-    h1{color:#000}.sub,.kicker{color:#333}
-    .grid{grid-template-columns:repeat(2,1fr);gap:10px}
-    .card{break-inside:avoid;box-shadow:none;border:1px solid #ccc}
-    .card .back{display:block!important}
-    .card .face-front{display:block!important}
-    .card.flipped .face-front{display:block}
+    @page{ size:A4; margin:10mm; }
+    html,body{background:#fff!important;color:#000!important}
+    header,.controls,.count,.overlay,footer,.draw,.note,.howto,.flip-hint{display:none!important}
+    .wrap{max-width:none;margin:0;padding:0}
+
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:5mm; margin:0; }
+
+    .card{
+      -webkit-print-color-adjust:exact; print-color-adjust:exact;
+      break-inside:avoid; page-break-inside:avoid;
+      height:127mm; overflow:hidden;
+      border:1px dashed #9aa0a6 !important; border-radius:8px;
+      box-shadow:none !important; background:#fff !important; color:#000 !important;
+    }
+    .card:nth-child(4n){ break-after:page; page-break-after:always; }
+    .card .top,.suiticon,.badge,.accentbar{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+    .card .pad{ padding:6mm; }
+    .card .face-front,.card .back,.card.flipped .face-front{ display:block !important; }
+    .front-txt{ font-size:13.5pt; }
+    .prompt{ font-size:10.5pt; color:#333; }
+    .back{ margin-top:5mm; padding-top:4mm; border-top:1px solid #e2e2e2; }
+    .back p{ font-size:9.5pt; }
+    .back h4{ color:#666; }
+    .suitname{ color:#444; }
+    .scaletag{ background:#f0f0f0; color:#555; }
   }
 </style>
 </head>
@@ -183,14 +222,34 @@
   <header>
     <div class="kicker">Стратегии за саморегулирано учене · 5.–12. клас</div>
     <h1>Тесте на ученето</h1>
-    <p class="sub">Карти с навици за учене: кои наистина <b>работят</b> <span class="and">и</span> кои само <b>изглеждат</b>, че работят. Изтегли карта, разгледай по тема или разпечатай тестето.</p>
+    <p class="sub">Карти с навици за учене: кои наистина <b>работят</b> <span class="and">и</span> кои само <b>изглеждат</b>, че работят.</p>
+    <div class="note">
+      <p>„Капан“ не означава, че дадена стратегия никога не помага. Означава, че лесно може да създаде усещане за учене, без непременно да води до трайно разбиране.</p>
+      <p>Тестето е създадено на основата на областите от въпросника „Как уча?“ и е допълнено с практики от науката за ученето.</p>
+    </div>
     <div class="draw">
       <button class="btn" id="drawBtn">🂠 Изтегли карта</button>
       <button class="btn ghost" id="printBtn">Разпечатай тестето</button>
     </div>
+
+    <details class="howto">
+      <summary>Как да използваш тестето</summary>
+      <ol>
+        <li>Разгледай картите.</li>
+        <li>Избери две, които разпознаваш в начина си на учене.</li>
+        <li>Избери една стратегия, която искаш да изпробваш.</li>
+        <li>Реши кога и по кой предмет ще я използваш.</li>
+        <li>След една седмица провери дали ти е помогнала.</li>
+      </ol>
+    </details>
   </header>
 
   <div class="controls">
+    <div class="row mode-row" id="modeRow">
+      <span class="mode-label">Версия:</span>
+      <button class="chip" data-mode="teacher" aria-pressed="true">Учителска</button>
+      <button class="chip" data-mode="student" aria-pressed="false">Ученическа</button>
+    </div>
     <div class="row" id="suitRow"></div>
     <div class="row type-row" id="typeRow">
       <button class="chip" data-type="all" aria-pressed="true">Всички</button>
@@ -203,8 +262,9 @@
   <div class="grid" id="grid"></div>
 
   <footer>
-    <p class="noprint">Всяка карта е свързана със скала от инструмента за саморегулирано учене (кодовете горе вдясно на гърба).<br>
+    <p class="noprint codes-note">Кодовете горе вдясно (SE, MCS, CL, CSD, CSO, CSU) показват връзката на всяка карта с областите от въпросника „Как уча?“.<br>
     Кликни върху карта, за да я обърнеш. Направено за екипа на Заедно в час.</p>
+    <p class="noprint student-note">Кликни върху карта, за да я обърнеш. Направено за екипа на Заедно в час.</p>
   </footer>
 </div>
 
@@ -241,13 +301,13 @@ const CARDS = [
   // --- Самоефикасност ---
   {suit:"self",type:"works",scale:"SE1·SE3",title:"Още не",prompt:"„Не мога да го реша… още.“",
    how:"Щом чуеш „не мога“ в главата си, добави думата „още“. „Не мога да реша уравнението“ става „Още не съм научил как.“",
-   why:"Мозъкът приема „още“ като задача с продължение, а не като край. Отваряш врата, вместо да я затвориш."},
-  {suit:"self",type:"works",scale:"SE4",title:"Малки стъпки",prompt:"Голямата задача плаши. Малката — не.",
+   why:"Думата „още“ превръща заключението „не мога“ във временна трудност, върху която можеш да работиш. Отваряш възможност за следваща стъпка, вместо да приемеш, че всичко е приключило."},
+  {suit:"self",type:"works",scale:"SE4",title:"Малки стъпки",prompt:"Голямата задача може да изглежда непосилна. Първата малка стъпка е по-лесна за започване.",
    how:"Раздели страшната задача на 3 малки стъпки, които можеш да започнеш веднага. Свърши първата, отбележи я, продължи.",
    why:"Всяка завършена стъпка е доказателство, че се справяш. Доказателствата надвиват страха."},
-  {suit:"self",type:"works",scale:"SE5",title:"Усилието строи мозъка",prompt:"Мъчиш се? Значи учиш.",
-   how:"Когато нещо е трудно и се напрягаш, мозъкът изгражда нови връзки. Трудността не е знак, че си слаб — тя е самото учене.",
-   why:"Колкото повече усилие, толкова по-способен ставаш — както мускул расте от натоварване."},
+  {suit:"self",type:"works",scale:"SE5",title:"Усилието развива уменията",prompt:"Трудността може да е част от ученето.",
+   how:"Когато задачата е трудна, използвай подходяща стратегия, потърси обратна връзка и опитай отново. Самото мъчение не е достатъчно — важно е да променяш подхода си.",
+   why:"Усилието, съчетано с добра стратегия, практика и обратна връзка, развива уменията ти. Напредъкът идва не просто от това да се стараеш повече, а да учиш по по-добър начин."},
   {suit:"self",type:"works",scale:"SE2·SE6",title:"Дневник на победите",prompt:"Какво днес успя, а миналата седмица не можеше?",
    how:"Веднъж седмично записвай по едно нещо, което вече ти се получава, а преди е било трудно.",
    why:"Усещането „не се справям“ лъже. Записаните победи са факти, които го опровергават."},
@@ -262,12 +322,12 @@ const CARDS = [
   {suit:"meta",type:"works",scale:"MCS2·MCS4",title:"Провери какво НЕ знаеш",prompt:"Учи това, което още не се получава.",
    how:"Преди тест направи списък на нещата, които са ти мъгливи. Насочи времето точно към тях, не към вече наученото.",
    why:"Приятно е да повтаряш познатото, но напредъкът е в неудобните места."},
-  {suit:"meta",type:"works",scale:"MCS9",title:"Тествай се, не препрочитай",prompt:"Затвори тетрадката и си спомни.",
-   how:"Вместо да четеш урока пак, покрий го и се опитай да го разкажеш наум или на глас. После провери какво си пропуснал.",
-   why:"Изваждането на информацията от паметта я закотвя много по-здраво от повторното четене."},
+  {suit:"meta",type:"works",scale:"MCS9",title:"Направи си въпроси",prompt:"Превърни урока във въпроси и после си отговори без учебника.",
+   how:"Използвай заглавията, ключовите думи и основните идеи, за да създадеш кратки въпроси. Затвори материала и опитай да им отговориш със свои думи.",
+   why:"Въпросите те карат активно да извличаш информацията от паметта и показват какво наистина знаеш и какво още трябва да учиш."},
   {suit:"meta",type:"works",scale:"MCS7",title:"Грешките са данни",prompt:"Сгрешил си? Питай „защо“ преди да продължиш.",
    how:"След всяка грешка спри и намери причината: не разбрах, не внимавах, или ми липсва знание. После я поправи.",
-   why:"Грешката, която разбереш, не се повтаря. Грешката, която подминеш, се връща на теста."},
+   why:"Грешката, която разбереш и поправиш, е по-малко вероятно да повториш. Грешката, която подминеш, често се връща отново."},
   {suit:"meta",type:"works",scale:"MCS12",title:"План Б",prompt:"Има повече от един път към отговора.",
    how:"Преди да се хвърлиш, помисли за 2–3 начина да решиш задачата и избери най-подходящия.",
    why:"Първата идея не винаги е най-добрата. Изборът между няколко пътя те прави по-гъвкав."},
@@ -300,7 +360,7 @@ const CARDS = [
    how:"Раздели ученето на кратки порции през няколко дни, вместо в един дълъг маратон.",
    why:"Паметта се засилва от паузите. Малкото забравяне и връщане е част от закотвянето."},
   {suit:"mem",type:"trap",scale:"CSD2",title:"Пето препрочитане",prompt:"Четеш урока за пети път.",
-   why:"Изглежда като учене, но връща малко. С всяко четене текстът става по-познат — а познатото ти се струва научено, макар да не е.",
+   why:"Самото многократно препрочитане често създава усещане за познатост, но не показва дали можеш да възпроизведеш информацията сам. С всяко четене текстът става по-познат — а познатото ти се струва научено, макар да не е.",
    instead:"Прочети веднъж внимателно, после затвори и си припомни."},
   {suit:"mem",type:"trap",scale:"—",title:"Нощен маратон",prompt:"Всичко за един дълъг маратон преди изпита.",
    why:"Може да мине за утре, но след седмица няма да остане нищо. Наученото на бърза ръка се изпарява бързо.",
@@ -339,9 +399,9 @@ const CARDS = [
   {suit:"deep",type:"works",scale:"CSU6",title:"Свържи предметите",prompt:"Как тази математика се среща с физиката?",
    how:"Търси връзки между това, което учиш по различни предмети.",
    why:"Знанието не живее в отделни кутии. Мостовете между предметите го правят по-здраво и по-полезно."},
-  {suit:"deep",type:"works",scale:"CSU3·CSU7",title:"Върни се и прегледай",prompt:"След урока хвърли поглед назад към бележките.",
-   how:"От време на време преглеждай прочетеното, вместо да го оставиш чак до следващия тест.",
-   why:"Кратък преглед скоро след ученето спира забравянето, преди то да е започнало."},
+  {suit:"deep",type:"works",scale:"CSU3·CSU7",title:"Върни се и се провери",prompt:"След урока се върни за кратко към материала и провери какво можеш да си припомниш.",
+   how:"Прегледай бележките за кратко, затвори ги и се опитай да възстановиш основните идеи без помощ. После провери какво си пропуснал.",
+   why:"Краткото връщане към материала през различни дни, съчетано с припомняне, помага знанието да се задържи по-дълго."},
   {suit:"deep",type:"trap",scale:"CSU5",title:"Думите ≠ идеята",prompt:"„Знам всички думи, значи разбирам.“",
    why:"Да разпознаваш термините не е същото като да схванеш идеята зад тях. Повърхността лъже за дълбочината.",
    instead:"Обясни идеята без учебника и без специалните думи — с най-простите изрази, които намериш."}
@@ -423,6 +483,14 @@ typeRow.addEventListener('click', e=>{
   activeType = b.dataset.type;
   [...typeRow.children].forEach(c=>c.setAttribute('aria-pressed', c===b));
   render();
+});
+
+// version: teacher (codes shown) / student (codes hidden)
+const modeRow = document.getElementById('modeRow');
+modeRow.addEventListener('click', e=>{
+  const b = e.target.closest('.chip'); if(!b) return;
+  document.body.classList.toggle('hide-codes', b.dataset.mode==='student');
+  [...modeRow.querySelectorAll('.chip')].forEach(c=>c.setAttribute('aria-pressed', c===b));
 });
 
 /* ---------- draw a random card ---------- */
