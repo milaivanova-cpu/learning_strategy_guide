@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тесте на ученето</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --felt:#241a42;
+    --felt-2:#2e2154;
+    --ink:#f4f1ff;
+    --muted:#b7add6;
+    --line:rgba(255,255,255,.12);
+    --card:#fbfaff;
+    --card-ink:#231a3f;
+    --card-muted:#6a6188;
+    --works:#2fae74;
+    --trap:#e8892b;
+    /* suit accents */
+    --s-self:#ff8a4c;
+    --s-meta:#2fc3d8;
+    --s-collab:#ff6ea6;
+    --s-mem:#8ad24a;
+    --s-org:#a98bff;
+    --s-deep:#ffcb45;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:'Onest',system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 700px at 15% -10%, #3a2a6b 0%, transparent 55%),
+      radial-gradient(1000px 800px at 100% 0%, #402a63 0%, transparent 50%),
+      var(--felt);
+    background-attachment:fixed;
+    min-height:100vh;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:34px 20px 90px}
+
+  /* ---------- header ---------- */
+  header{text-align:center;margin-bottom:26px}
+  .kicker{
+    font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;margin-bottom:14px;
+  }
+  h1{
+    font-family:'Unbounded',sans-serif;font-weight:800;
+    font-size:clamp(2.1rem,6vw,3.6rem);line-height:1;margin:0 0 14px;
+    letter-spacing:-.01em;
+  }
+  h1 .and{color:var(--s-self)}
+  .sub{color:var(--muted);max-width:640px;margin:0 auto;font-size:1.02rem}
+  .sub b{color:var(--ink);font-weight:600}
+
+  /* ---------- draw hero ---------- */
+  .draw{
+    margin:30px auto 8px;max-width:640px;
+    display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'Onest',sans-serif;font-weight:600;font-size:.98rem;
+    border:0;border-radius:999px;padding:13px 24px;cursor:pointer;
+    background:var(--s-self);color:#2a1500;transition:transform .12s ease, filter .12s ease;
+  }
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+  .btn:active{transform:translateY(0)}
+  .btn.ghost{background:rgba(255,255,255,.08);color:var(--ink);border:1px solid var(--line)}
+  .btn:focus-visible{outline:3px solid #fff;outline-offset:2px}
+
+  /* ---------- controls ---------- */
+  .controls{margin:34px 0 6px}
+  .controls .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .chip{
+    font-family:'Onest',sans-serif;font-size:.86rem;font-weight:500;
+    border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--muted);
+    padding:8px 14px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+    transition:all .14s ease;
+  }
+  .chip:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
+  .chip[aria-pressed="true"]{background:var(--ink);color:var(--felt);border-color:var(--ink);font-weight:600}
+  .chip .dot{width:9px;height:9px;border-radius:50%;background:var(--c,#fff);flex:none}
+  .chip svg{width:14px;height:14px}
+  .type-row{margin-top:12px}
+  .type-row .chip[aria-pressed="true"]{background:var(--ink);color:var(--felt)}
+  .count{text-align:center;color:var(--muted);font-size:.82rem;margin:16px 0 -4px;letter-spacing:.02em}
+
+  /* ---------- grid ---------- */
+  .grid{
+    margin-top:22px;display:grid;gap:16px;
+    grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+  }
+  .card{
+    position:relative;border-radius:18px;background:var(--card);color:var(--card-ink);
+    padding:0;cursor:pointer;overflow:hidden;
+    box-shadow:0 1px 0 rgba(255,255,255,.4) inset, 0 18px 30px -20px rgba(0,0,0,.7);
+    border:1px solid rgba(255,255,255,.5);
+    transition:transform .16s ease, box-shadow .16s ease;
+    animation:flipin .4s ease both;
+  }
+  @keyframes flipin{from{opacity:0;transform:rotateY(14deg) translateY(6px)}to{opacity:1;transform:none}}
+  .card:hover{transform:translateY(-4px);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 26px 40px -22px rgba(0,0,0,.75)}
+  .card:focus-visible{outline:3px solid #fff;outline-offset:3px}
+  .card .top{
+    height:6px;background:var(--accent);
+  }
+  .card .pad{padding:16px 17px 18px}
+  .card .meta{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .suiticon{
+    width:30px;height:30px;border-radius:9px;flex:none;
+    display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 18%,white);
+    color:var(--accent);
+  }
+  .suiticon svg{width:18px;height:18px}
+  .suitname{font-size:.72rem;font-weight:600;color:var(--card-muted);text-transform:uppercase;letter-spacing:.06em;line-height:1.15}
+  .badge{
+    margin-left:auto;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 9px;border-radius:999px;white-space:nowrap;
+  }
+  .badge.works{background:color-mix(in srgb,var(--works) 15%,white);color:#1c7d51}
+  .badge.trap{background:color-mix(in srgb,var(--trap) 16%,white);color:#b56415}
+
+  .front-txt{font-family:'Unbounded',sans-serif;font-weight:600;font-size:1.06rem;line-height:1.25;letter-spacing:-.01em}
+  .prompt{margin-top:9px;color:var(--card-muted);font-size:.92rem}
+
+  .back{display:none}
+  .card.flipped .face-front{display:none}
+  .card.flipped .back{display:block;animation:reveal .3s ease both}
+  @keyframes reveal{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .back h4{margin:0 0 5px;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--card-muted);font-weight:700}
+  .back p{margin:0 0 13px;font-size:.94rem}
+  .back .why{color:var(--card-ink)}
+  .back .instead p{font-weight:500}
+  .accentbar{display:inline-block;width:26px;height:3px;border-radius:2px;background:var(--accent);margin-bottom:11px}
+  .scaletag{
+    display:inline-block;margin-top:2px;font-size:.66rem;font-weight:600;letter-spacing:.05em;
+    color:var(--card-muted);background:rgba(0,0,0,.045);border-radius:6px;padding:3px 7px;
+  }
+  .flip-hint{position:absolute;bottom:12px;right:14px;font-size:.68rem;color:var(--card-muted);opacity:.7}
+
+  /* ---------- spotlight (draw) ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(15,10,32,.78);backdrop-filter:blur(4px);
+    display:none;place-items:center;padding:20px;z-index:40;
+  }
+  .overlay.on{display:grid;animation:fade .2s ease both}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .spot{width:min(420px,92vw)}
+  .spot .card{cursor:pointer;animation:deal .45s cubic-bezier(.2,.8,.25,1) both}
+  @keyframes deal{from{opacity:0;transform:translateY(40px) rotate(-4deg) scale(.9)}to{opacity:1;transform:none}}
+  .spot-actions{display:flex;gap:10px;justify-content:center;margin-top:18px}
+  .close-x{position:absolute;top:14px;right:16px;background:none;border:0;color:var(--ink);font-size:1.6rem;cursor:pointer;line-height:1;opacity:.8}
+  .close-x:hover{opacity:1}
+
+  footer{text-align:center;margin-top:56px;color:var(--muted);font-size:.8rem;line-height:1.7}
+  footer a{color:var(--muted)}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+  }
+
+  /* ---------- print ---------- */
+  @media print{
+    body{background:#fff;color:#000}
+    .draw,.controls,.count,.overlay,.flip-hint,footer .noprint{display:none!important}
+    .wrap{max-width:none;padding:0}
+    h1{color:#000}.sub,.kicker{color:#333}
+    .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+    .card{break-inside:avoid;box-shadow:none;border:1px solid #ccc}
+    .card .back{display:block!important}
+    .card .face-front{display:block!important}
+    .card.flipped .face-front{display:block}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Стратегии за саморегулирано учене · 5.–12. клас</div>
+    <h1>Тесте на ученето</h1>
+    <p class="sub">Карти с навици за учене: кои наистина <b>работят</b> <span class="and">и</span> кои само <b>изглеждат</b>, че работят. Изтегли карта, разгледай по тема или разпечатай тестето.</p>
+    <div class="draw">
+      <button class="btn" id="drawBtn">🂠 Изтегли карта</button>
+      <button class="btn ghost" id="printBtn">Разпечатай тестето</button>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="row" id="suitRow"></div>
+    <div class="row type-row" id="typeRow">
+      <button class="chip" data-type="all" aria-pressed="true">Всички</button>
+      <button class="chip" data-type="works" aria-pressed="false"><span class="dot" style="--c:var(--works)"></span>Работи</button>
+      <button class="chip" data-type="trap" aria-pressed="false"><span class="dot" style="--c:var(--trap)"></span>Капан</button>
+    </div>
+    <div class="count" id="count"></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    <p class="noprint">Всяка карта е свързана със скала от инструмента за саморегулирано учене (кодовете горе вдясно на гърба).<br>
+    Кликни върху карта, за да я обърнеш. Направено за екипа на Заедно в час.</p>
+  </footer>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="Изтеглена карта">
+  <button class="close-x" id="closeX" aria-label="Затвори">×</button>
+  <div class="spot">
+    <div id="spotCard"></div>
+    <div class="spot-actions">
+      <button class="btn" id="drawAgain">Изтегли друга</button>
+      <button class="btn ghost" id="flipSpot">Обърни картата</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- suit definitions (six scales of the SRL instrument) ---------- */
+const SUITS = {
+  self:  {name:"Самоефикасност", label:"Вярвам, че мога", accent:"var(--s-self)",
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>'},
+  meta:  {name:"Метакогниция", label:"Управлявам ученето си", accent:"var(--s-meta)",
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>'},
+  collab:{name:"Сътрудничество", label:"Уча заедно с други", accent:"var(--s-collab)",
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/></svg>'},
+  mem:   {name:"Запаметяване", label:"Запомням наистина", accent:"var(--s-mem)",
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 018-8 8 8 0 016.9 4"/><path d="M20 12a8 8 0 01-8 8 8 8 0 01-6.9-4"/><path d="M19 3v5h-5"/><path d="M5 21v-5h5"/></svg>'},
+  org:   {name:"Организиране", label:"Подреждам информацията", accent:"var(--s-org)",
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 12l9 5 9-5"/></svg>'},
+  deep:  {name:"Задълбочено разбиране", label:"Разбирам в дълбочина", accent:"var(--s-deep)",
+    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 100 18"/><path d="M12 7a5 5 0 100 10"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>'}
+};
+
+/* ---------- the cards ---------- */
+const CARDS = [
+  // --- Самоефикасност ---
+  {suit:"self",type:"works",scale:"SE1·SE3",title:"Още не",prompt:"„Не мога да го реша… още.“",
+   how:"Щом чуеш „не мога“ в главата си, добави думата „още“. „Не мога да реша уравнението“ става „Още не съм научил как.“",
+   why:"Мозъкът приема „още“ като задача с продължение, а не като край. Отваряш врата, вместо да я затвориш."},
+  {suit:"self",type:"works",scale:"SE4",title:"Малки стъпки",prompt:"Голямата задача плаши. Малката — не.",
+   how:"Раздели страшната задача на 3 малки стъпки, които можеш да започнеш веднага. Свърши първата, отбележи я, продължи.",
+   why:"Всяка завършена стъпка е доказателство, че се справяш. Доказателствата надвиват страха."},
+  {suit:"self",type:"works",scale:"SE5",title:"Усилието строи мозъка",prompt:"Мъчиш се? Значи учиш.",
+   how:"Когато нещо е трудно и се напрягаш, мозъкът изгражда нови връзки. Трудността не е знак, че си слаб — тя е самото учене.",
+   why:"Колкото повече усилие, толкова по-способен ставаш — както мускул расте от натоварване."},
+  {suit:"self",type:"works",scale:"SE2·SE6",title:"Дневник на победите",prompt:"Какво днес успя, а миналата седмица не можеше?",
+   how:"Веднъж седмично записвай по едно нещо, което вече ти се получава, а преди е било трудно.",
+   why:"Усещането „не се справям“ лъже. Записаните победи са факти, които го опровергават."},
+  {suit:"self",type:"trap",scale:"SE3·SE5",title:"„Не съм по…“",prompt:"„Аз просто не съм по математика.“",
+   why:"Звучи като честна самооценка, но е предсказание, което се самоизпълнява: щом решиш, че не можеш, спираш да опитваш.",
+   instead:"Смени го с „Още не съм научил тази част.“ Проблемът става конкретен и решим."},
+  {suit:"self",type:"trap",scale:"SE6",title:"Сравнение с отличника",prompt:"Измерваш се спрямо най-добрия в класа.",
+   why:"Мериш се с грешния човек и винаги губиш. Това сваля увереността, без да те прави по-добър.",
+   instead:"Сравнявай се със себе си отпреди месец. Това е състезанието, което можеш да спечелиш."},
+
+  // --- Метакогниция ---
+  {suit:"meta",type:"works",scale:"MCS2·MCS4",title:"Провери какво НЕ знаеш",prompt:"Учи това, което още не се получава.",
+   how:"Преди тест направи списък на нещата, които са ти мъгливи. Насочи времето точно към тях, не към вече наученото.",
+   why:"Приятно е да повтаряш познатото, но напредъкът е в неудобните места."},
+  {suit:"meta",type:"works",scale:"MCS9",title:"Тествай се, не препрочитай",prompt:"Затвори тетрадката и си спомни.",
+   how:"Вместо да четеш урока пак, покрий го и се опитай да го разкажеш наум или на глас. После провери какво си пропуснал.",
+   why:"Изваждането на информацията от паметта я закотвя много по-здраво от повторното четене."},
+  {suit:"meta",type:"works",scale:"MCS7",title:"Грешките са данни",prompt:"Сгрешил си? Питай „защо“ преди да продължиш.",
+   how:"След всяка грешка спри и намери причината: не разбрах, не внимавах, или ми липсва знание. После я поправи.",
+   why:"Грешката, която разбереш, не се повтаря. Грешката, която подминеш, се връща на теста."},
+  {suit:"meta",type:"works",scale:"MCS12",title:"План Б",prompt:"Има повече от един път към отговора.",
+   how:"Преди да се хвърлиш, помисли за 2–3 начина да решиш задачата и избери най-подходящия.",
+   why:"Първата идея не винаги е най-добрата. Изборът между няколко пътя те прави по-гъвкав."},
+  {suit:"meta",type:"works",scale:"MCS1·MCS5",title:"Спри и провери",prompt:"По средата: „Още ли съм на прав път?“",
+   how:"Докато работиш, спирай за миг и проверявай напредъка си, вместо да разбереш чак накрая, че си сгрешил в началото.",
+   why:"Малка проверка навреме спестява голямо преправяне после."},
+  {suit:"meta",type:"trap",scale:"MCS9",title:"Илюзията за разбиране",prompt:"„Ясно ми е, докато чета — значи го знам.“",
+   why:"Познатото усещане лъже. Да разпознаваш текста не значи, че можеш да го възпроизведеш сам.",
+   instead:"Затвори учебника и обясни темата със свои думи. Ако заекваш — още не я знаеш."},
+
+  // --- Сътрудничество ---
+  {suit:"collab",type:"works",scale:"CL3",title:"Обясни на приятел",prompt:"Искаш да провериш дали знаеш? Научи някой друг.",
+   how:"Опитай да обясниш материала на съученик или приятел, все едно ти си учителят.",
+   why:"За да обясниш нещо ясно, трябва наистина да си го разбрал. Дупките в знанието изскачат веднага."},
+  {suit:"collab",type:"works",scale:"CL1·CL2",title:"Група с ясна задача",prompt:"Всеки носи по един решен проблем, за да го обясни.",
+   how:"Когато учите заедно, дайте на всеки конкретна роля или задача, вместо просто „да учим заедно“.",
+   why:"Групата работи, когато има ясна цел. Иначе се превръща в разговор за друго."},
+  {suit:"collab",type:"trap",scale:"CL1",title:"Уж учим заедно",prompt:"„Събираме се да учим“ (и говорим за всичко друго).",
+   why:"Времето минава, усещаш се зает, но никой нищо не научава. Компанията заблуждава, че си учил.",
+   instead:"25 минути тих фокус, после почивка за разговори. Раздели двете."},
+  {suit:"collab",type:"trap",scale:"CL2",title:"Преписване",prompt:"Преписваш готовия отговор.",
+   why:"Получаваш отговора, но не и умението. На теста ще си сам, без кого да препишеш.",
+   instead:"Опитай сам, после сравни с приятел и обсъдете къде се разминавате."},
+
+  // --- Запаметяване ---
+  {suit:"mem",type:"works",scale:"CSD3",title:"Изваждай, не повтаряй",prompt:"Не чети фактите пак и пак — покрий ги и си ги припомни.",
+   how:"Вместо да повтаряш наум по десет пъти, закрий текста и се опитай да извадиш информацията от паметта си.",
+   why:"Всеки път, когато си спомниш нещо с усилие, връзката в мозъка става по-здрава."},
+  {suit:"mem",type:"works",scale:"—",title:"Разпредели във времето",prompt:"4×15 мин в 4 дни бият 60 мин в нощта преди теста.",
+   how:"Раздели ученето на кратки порции през няколко дни, вместо в един дълъг маратон.",
+   why:"Паметта се засилва от паузите. Малкото забравяне и връщане е част от закотвянето."},
+  {suit:"mem",type:"trap",scale:"CSD2",title:"Пето препрочитане",prompt:"Четеш урока за пети път.",
+   why:"Изглежда като учене, но връща малко. С всяко четене текстът става по-познат — а познатото ти се струва научено, макар да не е.",
+   instead:"Прочети веднъж внимателно, после затвори и си припомни."},
+  {suit:"mem",type:"trap",scale:"—",title:"Нощен маратон",prompt:"Всичко за един дълъг маратон преди изпита.",
+   why:"Може да мине за утре, но след седмица няма да остане нищо. Наученото на бърза ръка се изпарява бързо.",
+   instead:"Разпредели същото време в няколко по-къси сесии през дните преди това."},
+
+  // --- Организиране ---
+  {suit:"org",type:"works",scale:"CSO2",title:"Бележки със свои думи",prompt:"Записвай със свои думи, не дословно.",
+   how:"Когато си водиш бележки, преформулирай идеята, вместо да преписваш изречението от учебника.",
+   why:"Превеждането в твои думи изисква да си разбрал. Преписването не изисква нищо."},
+  {suit:"org",type:"works",scale:"CSO3",title:"Въпрос преди четене",prompt:"Задай си въпрос, после чети, за да му отговориш.",
+   how:"Преди да отвориш текста, помисли какво искаш да научиш от него. Чети, за да намериш отговора.",
+   why:"С въпрос в главата четеш активно и целенасочено, а не просто плъзгаш очи по редовете."},
+  {suit:"org",type:"works",scale:"CSO4",title:"Събери, после пиши",prompt:"Първо цялата информация, после текстът.",
+   how:"Когато имаш да напишеш текст, първо събери колкото можеш повече материал, чак после започни да пишеш.",
+   why:"Празният лист плаши по-малко, когато вече имаш суровината пред себе си."},
+  {suit:"org",type:"trap",scale:"CSO1",title:"Всичко в жълто",prompt:"Целият урок е светнал от маркер.",
+   why:"Ако всичко е важно, нищо не изпъква. Маркирането създава усещане за работа, но мозъкът стои в покой.",
+   instead:"Подчертай само най-важните 1–2 неща на страница, после ги обобщи със свои думи."},
+  {suit:"org",type:"trap",scale:"CSO2",title:"Дословно преписване",prompt:"Копираш изречение по изречение от учебника.",
+   why:"Ръката работи, мозъкът спи. Красивите бележки не значат, че знаеш какво пише в тях.",
+   instead:"Прочети абзаца, затвори книгата и запиши смисъла по памет."},
+
+  // --- Задълбочено разбиране ---
+  {suit:"deep",type:"works",scale:"CSU1",title:"Закачи за старото",prompt:"Свържи новото с това, което вече знаеш.",
+   how:"Питай се: „На какво прилича това? Къде съм го срещал?“ Свържи новия материал с познато.",
+   why:"Новото знание се задържа, когато има за какво да се хване. Самотният факт се забравя."},
+  {suit:"deep",type:"works",scale:"CSU2",title:"Пример от живота",prompt:"Свържи урока със свой личен опит.",
+   how:"Намери пример от собствения си живот, който илюстрира идеята.",
+   why:"Личните примери правят абстрактното конкретно и лесно за припомняне."},
+  {suit:"deep",type:"works",scale:"CSU5",title:"Обобщи със свои думи",prompt:"Разкажи главното, все едно обясняваш на по-малък.",
+   how:"След като прочетеш, обобщи най-важното с прости, свои думи.",
+   why:"Ако можеш да го кажеш просто, значи си го разбрал. Ако не — знаеш къде да се върнеш."},
+  {suit:"deep",type:"works",scale:"CSU4",title:"Питай „защо“ и „как“",prompt:"Не приемай факта наготово — питай защо е верен.",
+   how:"Пред всяко твърдение спри и питай „Защо е така? Как се стига дотук?“",
+   why:"Отговорът на „защо“ превръща зубренето в разбиране."},
+  {suit:"deep",type:"works",scale:"CSU6",title:"Свържи предметите",prompt:"Как тази математика се среща с физиката?",
+   how:"Търси връзки между това, което учиш по различни предмети.",
+   why:"Знанието не живее в отделни кутии. Мостовете между предметите го правят по-здраво и по-полезно."},
+  {suit:"deep",type:"works",scale:"CSU3·CSU7",title:"Върни се и прегледай",prompt:"След урока хвърли поглед назад към бележките.",
+   how:"От време на време преглеждай прочетеното, вместо да го оставиш чак до следващия тест.",
+   why:"Кратък преглед скоро след ученето спира забравянето, преди то да е започнало."},
+  {suit:"deep",type:"trap",scale:"CSU5",title:"Думите ≠ идеята",prompt:"„Знам всички думи, значи разбирам.“",
+   why:"Да разпознаваш термините не е същото като да схванеш идеята зад тях. Повърхността лъже за дълбочината.",
+   instead:"Обясни идеята без учебника и без специалните думи — с най-простите изрази, които намериш."}
+];
+
+/* ---------- render ---------- */
+const grid = document.getElementById('grid');
+const suitRow = document.getElementById('suitRow');
+const typeRow = document.getElementById('typeRow');
+const countEl = document.getElementById('count');
+let activeSuit = 'all';
+let activeType = 'all';
+
+// suit filter chips
+suitRow.innerHTML = '<button class="chip" data-suit="all" aria-pressed="true">Всички теми</button>' +
+  Object.entries(SUITS).map(([k,s])=>
+    `<button class="chip" data-suit="${k}" aria-pressed="false"><span class="dot" style="--c:${s.accent}"></span>${s.name}</button>`
+  ).join('');
+
+function cardHTML(c, i){
+  const s = SUITS[c.suit];
+  const badge = c.type==='works'
+    ? '<span class="badge works">✓ Работи</span>'
+    : '<span class="badge trap">✗ Капан</span>';
+  const back = c.type==='works'
+    ? `<span class="accentbar"></span>
+       <h4>Как</h4><p>${c.how}</p>
+       <h4>Защо помага</h4><p class="why">${c.why}</p>`
+    : `<span class="accentbar"></span>
+       <h4>Защо не работи</h4><p>${c.why}</p>
+       <div class="instead"><h4>Опитай вместо това</h4><p>${c.instead}</p></div>`;
+  return `<article class="card" style="--accent:${s.accent}" tabindex="0" data-i="${i}" aria-label="${c.title}">
+    <div class="top"></div>
+    <div class="pad">
+      <div class="meta">
+        <span class="suiticon">${s.icon}</span>
+        <span class="suitname">${s.name}${c.scale!=='—'?`<br><span class="scaletag">${c.scale}</span>`:''}</span>
+        ${badge}
+      </div>
+      <div class="face-front">
+        <div class="front-txt">${c.title}</div>
+        <div class="prompt">${c.prompt}</div>
+        <span class="flip-hint">натисни, за да обърнеш ↻</span>
+      </div>
+      <div class="back">${back}</div>
+    </div>
+  </article>`;
+}
+
+function render(){
+  const list = CARDS.map((c,i)=>({c,i})).filter(({c})=>
+    (activeSuit==='all'||c.suit===activeSuit) && (activeType==='all'||c.type===activeType));
+  grid.innerHTML = list.map(({c,i})=>cardHTML(c,i)).join('');
+  const w = list.filter(({c})=>c.type==='works').length;
+  const t = list.length - w;
+  countEl.textContent = `${list.length} карти · ${w} „работи" · ${t} „капан"`;
+}
+
+// flip on click / keyboard
+grid.addEventListener('click', e=>{
+  const card = e.target.closest('.card');
+  if(card) card.classList.toggle('flipped');
+});
+grid.addEventListener('keydown', e=>{
+  if((e.key==='Enter'||e.key===' ') && e.target.classList.contains('card')){
+    e.preventDefault(); e.target.classList.toggle('flipped');
+  }
+});
+
+// suit + type filters
+suitRow.addEventListener('click', e=>{
+  const b = e.target.closest('.chip'); if(!b) return;
+  activeSuit = b.dataset.suit;
+  [...suitRow.children].forEach(c=>c.setAttribute('aria-pressed', c===b));
+  render();
+});
+typeRow.addEventListener('click', e=>{
+  const b = e.target.closest('.chip'); if(!b) return;
+  activeType = b.dataset.type;
+  [...typeRow.children].forEach(c=>c.setAttribute('aria-pressed', c===b));
+  render();
+});
+
+/* ---------- draw a random card ---------- */
+const overlay = document.getElementById('overlay');
+const spotCard = document.getElementById('spotCard');
+let spotIdx = null;
+
+function pool(){
+  return CARDS.map((c,i)=>({c,i})).filter(({c})=>
+    (activeSuit==='all'||c.suit===activeSuit) && (activeType==='all'||c.type===activeType));
+}
+function draw(){
+  const p = pool(); if(!p.length) return;
+  let pick;
+  do { pick = p[Math.floor(Math.random()*p.length)]; }
+  while(p.length>1 && pick.i===spotIdx);
+  spotIdx = pick.i;
+  spotCard.innerHTML = cardHTML(pick.c, pick.i);
+  overlay.classList.add('on');
+}
+document.getElementById('drawBtn').addEventListener('click', draw);
+document.getElementById('drawAgain').addEventListener('click', draw);
+document.getElementById('flipSpot').addEventListener('click', ()=>{
+  const c = spotCard.querySelector('.card'); if(c) c.classList.toggle('flipped');
+});
+spotCard.addEventListener('click', e=>{
+  const c = e.target.closest('.card'); if(c) c.classList.toggle('flipped');
+});
+function closeOverlay(){ overlay.classList.remove('on'); }
+document.getElementById('closeX').addEventListener('click', closeOverlay);
+overlay.addEventListener('click', e=>{ if(e.target===overlay) closeOverlay(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeOverlay(); });
+
+document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+
+render();
+</script>
+</body>
+</html>
